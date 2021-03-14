@@ -10,9 +10,9 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+requirements = ['astropy > 2','tqdm','glob']
 
-setup_requirements = [ ]
+setup_requirements = []
 
 test_requirements = [ ]
 
