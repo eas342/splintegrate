@@ -6,13 +6,14 @@ import glob
 import os
 import tqdm
 import warnings
+import pdb
 from copy import deepcopy
 
 class splint:
     """
     Splint is the object for taking a multi-integration file and splitting it up
     """
-    def __init__(self,inFile=None,outDir=None,overWrite=False):
+    def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=True):
         """
         Initializes the objects
         
@@ -24,6 +25,8 @@ class splint:
             The path to the output directory
         overWrite: bool
             Overwrite existing files?
+        flipToDet: bool
+            Flip to detector coordinates (provisional)?
         """
         self.inFile = inFile
         if os.path.exists(self.inFile) == False:
@@ -47,7 +50,8 @@ class splint:
             os.mkdir(self.outDir)
         
         self.overWrite = overWrite
-        self.baseName = os.path.basename(self.inFile)
+        self.flipToDet = flipToDet
+        self.baseName = os.path.splitext(os.path.basename(self.inFile))[0]
         
     
     def split(self):
@@ -61,9 +65,18 @@ class splint:
             else:
                 _thisint = datCube[i]
             
+            thisHeader=deepcopy(self.head)
+            
+            if self.flipToDet == True:
+                outDat = flip_data(_thisint,self.head)
+                thisHeader['FLIP2DET'] = (True,'Flipped to detector coordinates?')
+            else:
+                outDat = _thisint
+                thisHeader['FLIP2DET'] = (True,'Flipped to detector coordinates?')
+            
             tmpStr="{:05d}".format(i+self.int_start_num-1)
             outFile = "{}_I{}.fits".format(self.baseName,tmpStr)
-            thisHeader=deepcopy(self.head)
+            
             thisHeader.insert("NINTS",("ON_NINT",i+self.int_start_num,"This is INT of TOT_NINT"),after=True)
             thisHeader.insert("ON_NINT",("TOT_NINT",self.nint_orig,"Total number of NINT in original exposure"),after=True)
             ## This is the number of ints in the file segment, which could be less than the total
@@ -78,12 +91,40 @@ class splint:
             #thisheader["COMMENT"] = 'splintegrate version {}'.format(__version__)
             outHDU = fits.PrimaryHDU(_thisint,header=thisHeader)
             
-            if (os.path.exists(outFile) & self.overWrite == False):
-                print("Found {}. Not overwriting".format(outFile))
+            outPath = os.path.join(self.outDir,outFile)
+            if (os.path.exists(outPath) & (self.overWrite == False)):
+                print("Found {}. Not overwriting".format(outPath))
             else:
-                outHDU.writeto(outFile)
+                outHDU.writeto(outPath,overwrite=self.overWrite)
             del outHDU
-            
+
+
+def flip_data(data,head):
+    """ This flips the detector coordinates from DMS to the Fitswriter way
+    
+    Perhaps using this module will make things easier in the future:
+    https://github.com/spacetelescope/jwst/blob/master/jwst/fits_generator/create_dms_data.py
+    
+    Parameters
+    ----------
+    data: numpy array
+        The input 2D array
+    head: astropy.io.fits header
+        Original
+    
+    Returns
+    ----------
+    """
+    
+    if 'DETECTOR' not in head:
+        raise Exception("Couldn't find detector name to know how to flip")
+    elif head['DETECTOR'] in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
+        return data[:,::-1]
+    elif head['DETECTOR'] in ['NRCBLONG','NRCA2','NRCA4','NRCB1','NRCB3']:
+        return data[::-1,:]
+    else:
+        raise NotImplementedError("Need to add this detector: {}".format(head['DETECTOR']))
+
 def get_fileList(self,inFiles):
     """
     Search a file list for a list of files

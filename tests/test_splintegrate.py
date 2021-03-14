@@ -5,7 +5,7 @@
 
 import unittest
 import os
-
+import glob
 from splintegrate import splintegrate
 
 
@@ -37,8 +37,11 @@ class TestSplintegrate(unittest.TestCase):
     def test_002_split_files(self):
         splint = splintegrate.splint(inFile=self.testFile,outDir=self.outDir,overWrite=True)
         splint.split()
-        
+        fileList = glob.glob(os.path.join(splint.outDir,splint.baseName+'*.fits'))
+        self.assertEqual(len(fileList),splint.nint,'Not the same number as output files as nint')
     
+    def test_003_check_baseName(self):
+        splint = splintegrate.splint(inFile=self.testFile,outDir=self.outDir,overWrite=True)
 
 if __name__ == '__main__':
     unittest.main()
