@@ -89,7 +89,7 @@ class splint:
             thisHeader.insert("NINTS",("NINT",1,"Number of ints"))
             thisHeader["COMMENT"] = 'Extracted from a multi-integration file by splintegrate'
             #thisheader["COMMENT"] = 'splintegrate version {}'.format(__version__)
-            outHDU = fits.PrimaryHDU(_thisint,header=thisHeader)
+            outHDU = fits.PrimaryHDU(outDat,header=thisHeader)
             
             outPath = os.path.join(self.outDir,outFile)
             if (os.path.exists(outPath) & (self.overWrite == False)):
