@@ -38,7 +38,7 @@ Once you have a copy of the source, you can install it with:
 
     $ pip install -e .
 
-The :code::`-e` makes it an editable install
+The :code:`-e` makes it an editable install where the code will be updated with each edit.
 
 .. _Github repo: https://github.com/eas342/splintegrate
 .. _tarball: https://github.com/eas342/splintegrate/tarball/master
