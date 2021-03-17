@@ -1,12 +1,12 @@
 .. highlight:: shell
 
-============
+=============
 Installation
-============
+=============
 
 
-Stable release
---------------
+<!-- Stable release
+--------------------
 
 To install Splintegrate, run this command in your terminal:
 
@@ -20,11 +20,11 @@ If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
 
 .. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/ -->
 
 
 From sources
-------------
+-------------
 
 The sources for Splintegrate can be downloaded from the `Github repo`_.
 
