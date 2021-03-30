@@ -33,9 +33,24 @@ class splint:
             warnings.warn('No file found. {}'.format(self.inFile))
             self.nint = 0
         else:
-            self.head = fits.getheader(self.inFile,ext=0)
-            self.int_start_num = self.head['INTSTART']
-            if self.head['INTEND'] == 0:
+            HDUList = fits.open(self.inFile)
+            self.head = HDUList[0].header
+            if 'INTSTART' not in self.head:
+                warnings.warn('INTSTART not found, trying SEGINTST')
+                self.int_start_num = self.head['SEGINTST']
+            else:
+                self.int_start_num = self.head['INTSTART']
+            
+            if 'INTEND' not in self.head:
+                warnings.warn('INTEND not found, reverting to using NINTS')
+                if 'NINTS' not in self.head:
+                    warnings.warn('NINTS not found, trying SEGINTED')
+                    self.nint = self.head['SEGINTED'] - self.int_start_num + 1  ## number in this file segment
+                    self.nint_orig = self.head['EXPINT']
+                else:
+                    self.nint = self.head['NINTS']
+                    self.nint_orig = self.nint
+            elif self.head['INTEND'] == 0:
                 warnings.warn('INTEND is 0, reverting to using NINTS')
                 self.nint = self.head['NINTS']
                 self.nint_orig = self.nint
@@ -43,7 +58,10 @@ class splint:
                 self.nint = self.head['INTEND'] - self.int_start_num + 1 ## number in this file segment
                 self.nint_orig = self.head['NINTS'] ## original number of integrations in exposure
             
-            self.times_tab = Table(fits.getdata(self.inFile,extname='INT_TIMES'))#HDUList['INT_TIMES'].data)
+            if 'INT_TIMES' in HDUList:
+                self.times_tab = Table(fits.getdata(self.inFile,extname='INT_TIMES'))#HDUList['INT_TIMES'].data)
+            else:
+                self.times_tab = Table()
         
         self.outDir = outDir
         if os.path.exists(self.outDir) == False:
@@ -76,7 +94,9 @@ class splint:
             
             tmpStr="{:05d}".format(i+self.int_start_num-1)
             outFile = "{}_I{}.fits".format(self.baseName,tmpStr)
-            
+
+            ## since we have split the ints, set nints to 1
+            thisHeader['NINTS'] = 1
             thisHeader.insert("NINTS",("ON_NINT",i+self.int_start_num,"This is INT of TOT_NINT"),after=True)
             thisHeader.insert("ON_NINT",("TOT_NINT",self.nint_orig,"Total number of NINT in original exposure"),after=True)
             ## This is the number of ints in the file segment, which could be less than the total
