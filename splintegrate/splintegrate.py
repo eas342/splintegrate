@@ -37,7 +37,7 @@ class splint:
             self.head = HDUList[0].header
             if 'INTSTART' not in self.head:
                 warnings.warn('INTSTART not found, trying SEGINTST')
-                self.int_start_num = self.head['SEGINTST']
+                self.int_start_num = self.head['SEGINTST'] + 1
             else:
                 self.int_start_num = self.head['INTSTART']
             
@@ -45,7 +45,7 @@ class splint:
                 warnings.warn('INTEND not found, reverting to using NINTS')
                 if 'NINTS' not in self.head:
                     warnings.warn('NINTS not found, trying SEGINTED')
-                    self.nint = self.head['SEGINTED'] - self.int_start_num + 1  ## number in this file segment
+                    self.nint = self.head['SEGINTED'] - self.int_start_num + 2  ## number in this file segment
                     self.nint_orig = self.head['EXPINT']
                 else:
                     self.nint = self.head['NINTS']
