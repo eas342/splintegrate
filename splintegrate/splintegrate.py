@@ -146,7 +146,6 @@ def flip_data(data,head,detectorName=None):
         else:
             detectorName = head['DETECTOR']
     if detectorName in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
-        pdb.set_trace()
         if ndim == 2:
             return data[:,::-1]
         elif ndim == 3:
