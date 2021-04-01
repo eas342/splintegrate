@@ -81,7 +81,7 @@ class splint:
         datCube = fits.getdata(self.inFile,extName='SCI')
         
         for i in tqdm.tqdm(np.arange(self.nint)):
-            
+
             if self.nint == 1:
                 _thisint = datCube
             else:
@@ -98,7 +98,7 @@ class splint:
             
             tmpStr="{:05d}".format(i+self.int_start_num-1)
             outFile = "{}_I{}.fits".format(self.baseName,tmpStr)
-
+            
             ## since we have split the ints, set nints to 1
             thisHeader['NINTS'] = 1
             thisHeader.insert("NINTS",("ON_NINT",i+self.int_start_num,"This is INT of TOT_NINT"),after=True)
@@ -145,7 +145,8 @@ def flip_data(data,head,detectorName=None):
             raise Exception("Couldn't find detector name to know how to flip")
         else:
             detectorName = head['DETECTOR']
-    elif detectorName in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
+    if detectorName in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
+        pdb.set_trace()
         if ndim == 2:
             return data[:,::-1]
         elif ndim == 3:
@@ -157,6 +158,8 @@ def flip_data(data,head,detectorName=None):
             return data[::-1,:]
         elif ndim == 3:
             return data[:,::-1,:]
+        else:
+            raise Exception("Don't know what to do with {} dimensions".format(ndim))
     else:
         raise NotImplementedError("Need to add this detector: {}".format(detectorName))
 
