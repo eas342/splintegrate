@@ -13,7 +13,8 @@ class splint:
     """
     Splint is the object for taking a multi-integration file and splitting it up
     """
-    def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=True):
+    def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=True,
+                 detectorName=None):
         """
         Initializes the objects
         
@@ -27,6 +28,8 @@ class splint:
             Overwrite existing files?
         flipToDet: bool
             Flip to detector coordinates (provisional)?
+        detectorName: str or None
+            Give a detector name for flipping. If None, it is read from the header automatically
         """
         self.inFile = inFile
         if os.path.exists(self.inFile) == False:
@@ -68,6 +71,7 @@ class splint:
             os.mkdir(self.outDir)
         
         self.overWrite = overWrite
+        self.detectorName = detectorName
         self.flipToDet = flipToDet
         self.baseName = os.path.splitext(os.path.basename(self.inFile))[0]
         
@@ -86,7 +90,7 @@ class splint:
             thisHeader=deepcopy(self.head)
             
             if self.flipToDet == True:
-                outDat = flip_data(_thisint,self.head)
+                outDat = flip_data(_thisint,self.head,detectorName=self.detectorName)
                 thisHeader['FLIP2DET'] = (True,'Flipped to detector coordinates?')
             else:
                 outDat = _thisint
@@ -119,7 +123,7 @@ class splint:
             del outHDU
 
 
-def flip_data(data,head):
+def flip_data(data,head,detectorName=None):
     """ This flips the detector coordinates from DMS to the Fitswriter way
     
     Perhaps using this module will make things easier in the future:
@@ -135,15 +139,26 @@ def flip_data(data,head):
     Returns
     ----------
     """
-    
-    if 'DETECTOR' not in head:
-        raise Exception("Couldn't find detector name to know how to flip")
-    elif head['DETECTOR'] in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
-        return data[:,::-1]
-    elif head['DETECTOR'] in ['NRCBLONG','NRCA2','NRCA4','NRCB1','NRCB3']:
-        return data[::-1,:]
+    ndim = len(data.shape)
+    if detectorName is None:
+        if 'DETECTOR' not in head:
+            raise Exception("Couldn't find detector name to know how to flip")
+        else:
+            detectorName = head['DETECTOR']
+    elif detectorName in ['NRCALONG','NRCA1','NRCA3','NRCB2','NRCB4']:
+        if ndim == 2:
+            return data[:,::-1]
+        elif ndim == 3:
+            return data[:,:,::-1]
+        else:
+            raise Exception("Don't know what to do with {} dimensions".format(ndim))
+    elif detectorName in ['NRCBLONG','NRCA2','NRCA4','NRCB1','NRCB3']:
+        if ndim == 2:
+            return data[::-1,:]
+        elif ndim == 3:
+            return data[:,::-1,:]
     else:
-        raise NotImplementedError("Need to add this detector: {}".format(head['DETECTOR']))
+        raise NotImplementedError("Need to add this detector: {}".format(detectorName))
 
 def get_fileList(self,inFiles):
     """
