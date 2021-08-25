@@ -38,6 +38,7 @@ setup(
     include_package_data=True,
     keywords='splintegrate',
     name='splintegrate',
+    scripts=['bin/quick_split'],
     packages=find_packages(include=['splintegrate', 'splintegrate.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
