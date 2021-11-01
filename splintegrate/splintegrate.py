@@ -14,7 +14,7 @@ class splint:
     Splint is the object for taking a multi-integration file and splitting it up
     """
     def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=True,
-                 detectorName=None):
+                 detectorName=None,mirageSeedFile=False):
         """
         Initializes the objects
         
@@ -30,21 +30,31 @@ class splint:
             Flip to detector coordinates (provisional)?
         detectorName: str or None
             Give a detector name for flipping. If None, it is read from the header automatically
+        mirageSeedFile: bool
+            Is it a mirage seed file? This requires extra treatment for the differet parts of segments
         """
         self.inFile = inFile
+        self.mirageSeedFile = mirageSeedFile
+        
         if os.path.exists(self.inFile) == False:
             warnings.warn('No file found. {}'.format(self.inFile))
             self.nint = 0
         else:
             HDUList = fits.open(self.inFile)
             self.head = HDUList[0].header
-            if 'INTSTART' not in self.head:
+            if self.mirageSeedFile == True:
+                self.int_start_num = self.head['SEGINTST'] + 1 + self.head['PTINTSRT']
+            elif 'INTSTART' not in self.head:
                 warnings.warn('INTSTART not found, trying SEGINTST')
                 self.int_start_num = self.head['SEGINTST'] + 1
             else:
                 self.int_start_num = self.head['INTSTART']
-            
-            if 'INTEND' not in self.head:
+
+            if self.mirageSeedFile == True:
+                head1 = HDUList[1].header
+                self.nint = head1['NAXIS4'] ## didn't find a better keyword
+                self.nint_orig = self.head['EXPINT']
+            elif 'INTEND' not in self.head:
                 warnings.warn('INTEND not found, reverting to using NINTS')
                 if 'NINTS' not in self.head:
                     warnings.warn('NINTS not found, trying SEGINTED')
