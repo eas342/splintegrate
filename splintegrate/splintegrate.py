@@ -172,7 +172,7 @@ def flip_data(data,head,detectorName=None):
     else:
         raise NotImplementedError("Need to add this detector: {}".format(detectorName))
 
-def get_fileList(self,inFiles):
+def get_fileList(inFiles):
     """
     Search a file list for a list of files
     
@@ -182,4 +182,14 @@ def get_fileList(self,inFiles):
         A search string (can contain * ) for the files to split
     """
     #self.nFile = len(self.fileList)
-    return glob.glob(inFiles)
+    return np.sort(glob.glob(inFiles))
+
+def run_on_multiple(inFiles,**kwargs):
+    fileList = get_fileList(inFiles)
+    print("Splitting up {} original file(s)".format(len(fileList)))
+    
+    for oneFile in fileList:
+        sp1 = splint(inFile=oneFile,**kwargs)
+        
+        sp1.split()
+    
