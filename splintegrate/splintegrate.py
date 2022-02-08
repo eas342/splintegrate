@@ -44,12 +44,15 @@ class splint:
             self.head = HDUList[0].header
             if self.mirageSeedFile == True:
                 self.int_start_num = self.head['SEGINTST'] + 1 + self.head['PTINTSRT']
-            elif 'INTSTART' not in self.head:
+            elif ('INTSTART' not in self.head) & ('SEGINTST' in self.head):
                 warnings.warn('INTSTART not found, trying SEGINTST')
                 self.int_start_num = self.head['SEGINTST'] + 1
-            else:
+            elif 'INTSTART' in self.head:
                 self.int_start_num = self.head['INTSTART']
-
+            else:
+                warnings.warn('INTSTART not found, setting the int start to 1')
+                self.int_start_num = 1
+            
             if self.mirageSeedFile == True:
                 head1 = HDUList[1].header
                 self.nint = head1['NAXIS4'] ## didn't find a better keyword
