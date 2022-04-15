@@ -91,14 +91,35 @@ class splint:
     
     def split(self):
         
-        datCube = fits.getdata(self.inFile,extName='SCI')
+        origHDUList = fits.open(self.inFile)
+        
+        datCube = origHDUList['SCI'].data
+        if 'ERR' in origHDUList:
+            save_error=True
+            errCube = origHDUList['ERR'].data
+        else:
+            save_error= False
+        
+        if 'DQ' in origHDUList:
+            save_dq =True
+            dqCube = origHDUList['DQ'].data
+        else:
+            save_dq = False
         
         for i in tqdm.tqdm(np.arange(self.nint)):
 
             if self.nint == 1:
                 _thisint = datCube
+                if save_error == True:
+                    _thiserr = errCube
+                if save_dq == True:
+                    _thisdq = dqCube
             else:
                 _thisint = datCube[i]
+                if save_error == True:
+                    _thiserr = errCube[i]
+                if save_dq == True:
+                    _thisdq = dqCube[i]
             
             thisHeader=deepcopy(self.head)
             
@@ -127,14 +148,30 @@ class splint:
             thisHeader["COMMENT"] = 'Extracted from a multi-integration file by splintegrate'
             #thisheader["COMMENT"] = 'splintegrate version {}'.format(__version__)
             outHDU = fits.PrimaryHDU(outDat,header=thisHeader)
+            outHDU.name = 'SCI'
+            
+            outHDUList = fits.HDUList(outHDU)
+            
+            if save_error == True:
+                errHDU = fits.ImageHDU(_thiserr,origHDUList['ERR'].header)
+                errHDU.name = 'ERR'
+                outHDUList.append(errHDU)
+            
+            if save_dq == True:
+                dqHDU = fits.ImageHDU(_thisdq,origHDUList['DQ'].header)
+                dqHDU.name = 'DQ'
+                outHDUList.append(dqHDU)
             
             outPath = os.path.join(self.outDir,outFile)
             if (os.path.exists(outPath) & (self.overWrite == False)):
                 print("Found {}. Not overwriting".format(outPath))
             else:
-                outHDU.writeto(outPath,overwrite=self.overWrite)
-            del outHDU
-
+                outHDUList.writeto(outPath,overwrite=self.overWrite)
+            del outHDUList
+        
+        origHDUList.close()
+        del origHDUList
+        
 
 def flip_data(data,head,detectorName=None):
     """ This flips the detector coordinates from DMS to the Fitswriter way
