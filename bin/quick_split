@@ -13,7 +13,7 @@ parser.add_argument('--flipToDet', dest='flipToDet', action='store_true',
                     help='Flip from DMS to detector coordinates?')
 parser.add_argument('--no-flipToDet', dest='flipToDet', action='store_false',
                     help="Don't flip from DMS to detector coordinates?")
-parser.set_defaults(flipToDet=True)
+parser.set_defaults(flipToDet=False)
 
 
 parser.add_argument('--mirageSeed', dest='mirageSeed', action='store_true',

@@ -13,7 +13,7 @@ class splint:
     """
     Splint is the object for taking a multi-integration file and splitting it up
     """
-    def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=True,
+    def __init__(self,inFile=None,outDir=None,overWrite=False,flipToDet=False,
                  detectorName=None,mirageSeedFile=False):
         """
         Initializes the objects
