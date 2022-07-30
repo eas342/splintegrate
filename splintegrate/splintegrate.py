@@ -141,8 +141,9 @@ class splint:
             thisHeader.insert("TOT_NINT",("SEGNINT",self.nint,"Total number of NINT in the segment or file"),after=True)
             
             if len(self.times_tab) == self.nint:
-                thisHeader.insert("DATE-OBS",("BJDMID",self.times_tab[i]['int_mid_BJD_TDB'],"Mid-integration time (MBJD_TDB)"),after=True)
+                thisHeader.insert("TIME-OBS",("BJDMID",self.times_tab[i]['int_mid_BJD_TDB'],"Mid-integration time (MBJD_TDB)"),after=True)
                 thisHeader.insert("BJDMID",("MJDSTART",self.times_tab[i]['int_start_MJD_UTC'],"Int start time (MJD_UTC)"),after=True)
+            pdb.set_trace()
             thisHeader['NINTS'] = 1 # set nint to 1
             thisHeader.insert("NINTS",("NINT",1,"Number of ints"))
             thisHeader["COMMENT"] = 'Extracted from a multi-integration file by splintegrate'
