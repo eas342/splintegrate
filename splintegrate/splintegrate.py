@@ -143,6 +143,7 @@ class splint:
             if len(self.times_tab) == self.nint:
                 thisHeader.insert("TIME-OBS",("BJDMID",self.times_tab[i]['int_mid_BJD_TDB'],"Mid-integration time (MBJD_TDB)"),after=True)
                 thisHeader.insert("BJDMID",("MJDSTART",self.times_tab[i]['int_start_MJD_UTC'],"Int start time (MJD_UTC)"),after=True)
+                thisHeader.insert("MJDSTART", ("MJDMIDI",self.times_tab[i]['int_mid_BJD_TDB'],"Int mid time (MJD_UTC)"),after=True)
             
             thisHeader['NINTS'] = 1 # set nint to 1
             thisHeader.insert("NINTS",("NINT",1,"Number of ints"))
