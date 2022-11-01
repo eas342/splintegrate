@@ -109,11 +109,18 @@ class splint:
         for i in tqdm.tqdm(np.arange(self.nint)):
 
             if self.nint == 1:
-                _thisint = datCube
-                if save_error == True:
-                    _thiserr = errCube
-                if save_dq == True:
-                    _thisdq = dqCube
+                if len(datCube.shape) > 2:
+                    _thisint = datCube[0]
+                    if save_error == True:
+                        _thiserr = errCube[0]
+                    if save_dq == True:
+                        _thisdq = dqCube[0]
+                else:
+                    _thisint = datCube
+                    if save_error == True:
+                        _thiserr = errCube
+                    if save_dq == True:
+                        _thisdq = dqCube
             else:
                 _thisint = datCube[i]
                 if save_error == True:
