@@ -135,7 +135,7 @@ class splint:
                 thisHeader['FLIP2DET'] = (True,'Flipped to detector coordinates?')
             else:
                 outDat = _thisint
-                thisHeader['FLIP2DET'] = (True,'Flipped to detector coordinates?')
+                thisHeader['FLIP2DET'] = (False,'Flipped to detector coordinates?')
             
             tmpStr="{:05d}".format(i+self.int_start_num-1)
             outFile = "{}_I{}.fits".format(self.baseName,tmpStr)
